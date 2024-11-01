@@ -1,0 +1,17 @@
+{
+    "original_arrival_data":"C:\\Users\\Lenovo\\Desktop\\ReinforcementLearning\\FlightML\\FLIGHT_LOAD_ML_202310161702_arrival.csv",
+    "original_departure_data":"C:\\Users\\Lenovo\\Desktop\\ReinforcementLearning\\FlightML\\FLIGHT_LOAD_ML_202310161709_depature.csv",
+    "training_data":"data\\Training\\TrainingData.csv",
+    "arrival_prophet_model":"models\\prophet_arrival_model.joblib",
+    "departure_prophet_model":"models\\prophet_departure_model.joblib",
+    "serving_data":"data\\Serving\\serving_data.csv",
+    "predictions":"data\\Serving\\predicted_changes.csv",
+    "arrivals_new_predictions":"data\\Prediction_Improvement\\arrivals_new_predictions.csv",
+    "departures_new_predictions":"data\\Prediction_Improvement\\departures_new_predictions.csv",
+    "arrivals_old_predictions":"data\\Prediction_Improvement\\arrivals_old_predictions.csv",
+    "departures_old_predictions":"data\\Prediction_Improvement\\departures_old_predictions.csv"
+
+
+
+
+}
