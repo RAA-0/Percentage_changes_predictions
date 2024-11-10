@@ -1,13 +1,13 @@
 import pandas as pd 
 import joblib
-from Training.Preprocessingg import EventFeatureExtractor
+from Training.Preprocessingg import PreProcessor
 from path_config.paths_config import PathConfig
 
 def main():
-    p = EventFeatureExtractor()
+    p = PreProcessor()
     df = pd.read_csv(conf.path('serving_data'))
     df_=df.copy()
-    data=p.extract(df)
+    data=p.preprocess(df)
     for target in ['arrival','departure']:
         model = joblib.load(conf.path(f'{target}_prophet_model'))
         predictions = model.predict(data)['yhat']

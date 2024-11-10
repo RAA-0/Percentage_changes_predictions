@@ -12,15 +12,14 @@ import random
 
 
 class GlobalHealthScraper:
-    def __init__(self,result_path,years):
-        self.result_path = result_path
+    def __init__(self,years):
         self.years = years
 
     def get_url(self,url):
-        service = Service(executable_path="C:/Program Files (x86)/chromedriver.exe")
+        service = Service(executable_path="C:/Users/Lenovo/Desktp/chromedriver-win64/chromedriver.exe")
         options = Options()
         options.add_argument('--headless')
-        driver = webdriver.Chrome(service = service,options=options)
+        driver = webdriver.Chrome(service = service)
         driver.get(url)
         time.sleep(random.uniform(2,5))
         return driver 
@@ -29,15 +28,15 @@ class GlobalHealthScraper:
     def scrape_news(self,n):
         url = "https://www.who.int/news"
         driver = self.get_url(url)
+        self.new_news=defaultdict
         for year in self.years:
             try:
+                print("still waiting...")
                 year_dropdown = WebDriverWait(driver,10).until(EC.element_to_be_clickable((By.XPATH, '/html/body/div[3]/section/div[2]/div/div/div/div[2]/div[2]/div/div[1]/div/div/div/div[5]/span/span')))
                 driver.execute_script("arguments[0].click();",year_dropdown)
                 #year_dropdown.click()
                 year_option = WebDriverWait(driver, 10).until(EC.element_to_be_clickable((By.XPATH, "//li[@data-offset-index='4']")))
                 year_option.click()
-
-        
                 print(f"year  is clicked")
                 
             except:
@@ -64,6 +63,7 @@ class GlobalHealthScraper:
                             n[date.text].append(news.text)
                         else:
                             n[date.text] = [news.text]
+                        self.new_news.append(news.text)
                         
                     print(n)
                     
@@ -93,7 +93,8 @@ class GlobalHealthScraper:
         with open("Scraping\\Global_health\\AUXGlobalHealthNews2.json","r") as w:
             old_data = json.load(w)
         self.scrape_news(old_data)
+        return self.new_news
 
 if __name__ == "__main__":
-    scraper = GlobalHealthScraper("ss",["2021"])
+    scraper = GlobalHealthScraper(["2024"])
     scraper.run()

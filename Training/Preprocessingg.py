@@ -1,16 +1,15 @@
 import json
+from feature_engine.pipeline import Pipeline
+from Training.EventDetection import EventDetector
+from Training.EventExtraction import EventFeatureExtractor
 
-class EventFeatureExtractor:
+class PreProcessor:
     def __init__(self):
-        self.non_recurrent_events=[]
-        with open('event_config.json') as r:
-            event_config=json.load(r)
-        for event in event_config.keys():
-            if event_config[event]['type']=='variable_dates_events':
-                self.non_recurrent_events.append(event)
+        pass
 
-    def extract(self,data):
-        print('extractingg...')
-        for event in self.non_recurrent_events:
-            data[event] = data['event'].isin([event]).astype(int)
-        return data 
+    def preprocess(self,data):
+        piepln = Pipeline([("Event Detection",EventDetector()),
+                          ("Feature Extraction",EventFeatureExtractor())])
+        transformed_data = piepln.fit_transform(data)
+
+        return transformed_data
