@@ -5,39 +5,36 @@ from selenium.webdriver.chrome.service import Service
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.common.keys import Keys
-from selenium.webdriver.common.action_chains import ActionChains
 from collections import defaultdict
+from abstract_scraper import AbstractScraper
+from selenium.webdriver.common.action_chains import ActionChains
 import json 
 import time
 import random 
 
 
-class GlobalHealthScraper:
+class GlobalHealthScraper(AbstractScraper):
     def __init__(self,years):
+        super().__init__()
         self.years = years
+        self.years_indices()
 
-    def get_url(self,url):
-        service = Service(executable_path="C:/Users/Lenovo/Desktp/chromedriver-win64/chromedriver.exe")
-        options = Options()
-        options.add_argument('--headless')
-        driver = webdriver.Chrome(service = service)
-        driver.get(url)
-        time.sleep(random.uniform(2,5))
-        return driver 
+    @property
+    def website_url(self):
+        return "https://www.who.int/news"
     
     
     def scrape_news(self,n):
-        url = "https://www.who.int/news"
-        driver = self.get_url(url)
+        driver = super().get_url(self.website_url)
         self.new_news=defaultdict(list)
         for year in self.years:
             try:
                 print("still waiting...")
                 year_dropdown = WebDriverWait(driver,10).until(EC.element_to_be_clickable((By.XPATH, '/html/body/div[3]/section/div[2]/div/div/div/div[2]/div[2]/div/div[1]/div/div/div/div[5]/span/span/span[2]/span')))
                 ActionChains(driver).move_to_element(year_dropdown).click().perform()
-                year_option = WebDriverWait(driver, 10).until(EC.element_to_be_clickable((By.XPATH, "//li[@data-offset-index='1']")))
+                year_option = WebDriverWait(driver, 10).until(EC.element_to_be_clickable((By.XPATH, f"//li[@data-offset-index='{self.index_of_year[year]}']")))
                 year_option.click()
-                print(f"year  is clicked")
+                print(f"year {year}  is clicked")
                 
             except:
                 print("the year was not chosen")
@@ -62,7 +59,6 @@ class GlobalHealthScraper:
                             n[date.text].append(news.text)
                         else:
                             n[date.text] = [news.text]
-                        print("#@4")
                         self.new_news[date.text].append(news.text)
                         
                     print(n)
@@ -83,9 +79,9 @@ class GlobalHealthScraper:
                     print(n)
                     with open("GlobalHealthNews2022.json","w") as ww:
                         json.dump(n,ww,indent=4)
-            except Exception as e:
-                print(f"there was a problem: {e}")
-                with open("AUXGlobalHealthNews22.json","w") as w2w:
+            except:
+                print("there was a problem")
+                with open("AUXGlobalHealthNews2w.json","w") as w2w:
                         json.dump(n,w2w,indent=4)
             
 
@@ -94,6 +90,14 @@ class GlobalHealthScraper:
             old_data = json.load(w)
         self.scrape_news(old_data)
         return self.new_news
+    
+    def years_indices(self,start_year=None):
+        self.index_of_year=defaultdict(str)
+        if start_year is None:
+            start_year = 2025
+        for i in range(0,36):
+            self.index_of_year[str(start_year)]=str(i)
+            start_year-=1 
 
 if __name__ == "__main__":
     scraper = GlobalHealthScraper(["2024"])
