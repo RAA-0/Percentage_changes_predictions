@@ -68,7 +68,6 @@ class SportsScraper(AbstractScraper):
         date = pd.to_datetime(date)
         if date<=max_date:
             events_on_day = get_event(df,date)
-            print(events_on_day)
         else:
             return []
             self.run()
