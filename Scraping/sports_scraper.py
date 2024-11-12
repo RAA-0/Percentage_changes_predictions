@@ -1,23 +1,18 @@
-from selenium import webdriver 
-from selenium.webdriver.chrome.options import Options 
 from selenium.webdriver.common.by import By
-from selenium.webdriver.chrome.service import Service
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
-from selenium.webdriver.common.keys import Keys
 from collections import defaultdict
-from abstract_scraper import AbstractScraper
+from Scraping.abstract_scraper import AbstractScraper
+from Scraping.Sports_.fixingSportsNewsForm import FormFixer
 import json 
 import time
 import random 
+import pandas as pd 
+import ast 
 
 class SportsScraper(AbstractScraper):
     def __init__(self):
-       super().__init__()
-
-    @property
-    def website_url(self):
-        return ["https://www.scoreandchange.com/sports_events/past-events","https://www.scoreandchange.com/sports_events/"]
+       super().__init__("sports")
 
     def get_url(self,url):
         driver = super().get_url(url)
@@ -50,7 +45,33 @@ class SportsScraper(AbstractScraper):
 
     def run(self):
         self.scrape_news()
-
-if __name__ == "__main__":
-    scraper = SportsScraper()
-    scraper.run()
+    
+    def fix_form(self):
+        ff=FormFixer(self.file_path,self.df_path)
+        ff.run()
+    def detect_event(self,date):
+        def get_event(df,date_):
+            events_on_day = []
+            #year = date_.year
+            #month = date_.month
+            #day = date_.day
+            matching_rows = df[ (pd.to_datetime(df['date']) == pd.to_datetime(date_))]
+            if not matching_rows.empty:
+                sport_event = matching_rows.iloc[0]['event']
+                sport_event = ast.literal_eval(sport_event)  
+                events_on_day.extend(sport_event) 
+            return events_on_day 
+        df = pd.read_csv('Scraping\\Sports_\\expanded_sports_df.csv')
+        #df['date'] = pd.to_datetime(df[['year', 'month','day']])
+        df['date']=pd.to_datetime(df['date'])
+        max_date = df['date'].max()
+        date = pd.to_datetime(date)
+        if date<=max_date:
+            events_on_day = get_event(df,date)
+            print(events_on_day)
+        else:
+            return []
+            self.run()
+            events_on_day = get_event(df,date)
+        return events_on_day
+            

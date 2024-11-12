@@ -6,13 +6,14 @@ import time
 
 class Scraper(AbstractScraper):
     def __init__(self):
-        pass
+        super().__init__()
+
     @property
     def website_url(self):
         return 'https://www.visitdubai.com/en/whats-on/dubai-events-calendar?tags='
 
     def scrape_news(self):
-        driver = self.get_url(self.website_url)
+        driver = super().get_url(self.website_url)
         count=0
         while True:
             try:
@@ -31,6 +32,4 @@ class Scraper(AbstractScraper):
 a = Scraper()
 a.scrape_news()
 
-## what if we do an abstract class for Scraper 
-# where it has the scrape news , get url , run functions 
-# and then it has also the function to tell if there is an event 
+ 

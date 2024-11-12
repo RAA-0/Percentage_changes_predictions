@@ -2,21 +2,23 @@ import pandas as pd
 import re 
 import json 
 
-class FromFixer:
-    def __init__(self):
+class FormFixer:
+    def __init__(self,file_path,df_path):
+        self.file_path = file_path
+        self.df_path = df_path
         self.mapping ={"January":"01","February":"02", "March":"03","April":"04","May":"05","June":"06","July":"07","August":"08","September":"09","October":"10","November":"11","December":"12"}
 
     def extract_date(self,date):   
-        pattern0 = re.compile(r'(\d{1,2})(\D+)(\d{4})[-\u2013](\d{1,2})(\D+)(\d{4})')#28December2023–7January2024
-        pattern1 = re.compile(r'(\d{1,2})(\D+)[-\u2013](\d{1,2})(\D+)(\d{4})')# 1July-1August
-        pattern2 = re.compile(r'(\d{1,2})[-\u2013](\d{1,2})(\D+)(\d{4})')#1-3July
-        pattern3 = re.compile(r'(\d{1,2})(\D+)(\d{4})')#2 july
-        pattern7 =  re.compile(r'([\d{1,2}]+)(\D+)[&and](\d{1,2})(\D+)(\d{4})') #1,2,3 &/and July 
-        pattern8 =  re.compile(r'([\d{1,2}]+)[-\u2013](\d{1,2})(\D+)[&and](\d{1,2})[-\u2013](\d{1,2})(\D+)(\d{4})') #1,2,3 &/and July 
+        pattern0 = re.compile(r'(\d{1,2})(\D+)(\d{4})[-\u2013](\d{1,2})(\D+)(\d{4})')##28December2023–7January2024
+        pattern1 = re.compile(r'(\d{1,2})(\D+)[-\u2013](\d{1,2})(\D+)(\d{4})')## 1July-1August
+        pattern2 = re.compile(r'(\d{1,2})[-\u2013](\d{1,2})(\D+)(\d{4})')##1-3July
+        pattern3 = re.compile(r'(\d{1,2})(\D+)(\d{4})')##2 july
+        pattern7 =  re.compile(r'([\d{1,2}]+)(\D+)[&and](\d{1,2})(\D+)(\d{4})') ##1,2,3 &/and July 
+        pattern8 =  re.compile(r'([\d{1,2}]+)[-\u2013](\d{1,2})(\D+)[&and](\d{1,2})[-\u2013](\d{1,2})(\D+)(\d{4})') ##1,2,3 &/and July 
         pattern9 = re.compile(r'([\d{1,2}]+)and(\d{1,2})(\D+)(\d{4})') 
         pattern10 = re.compile(r'(\d{1,2})[-\u2013](\d{1,2})(\D+)&(\d{1,2})(\D+)[-\u2013](\d{1,2})(\D+)(\d{4})')
 
-        pattern4 = re.compile(r'([\d,]+)[&and]*(\d{1,2})(\D+)(\d{4})') #1,2,3 &/and July 
+        pattern4 = re.compile(r'([\d,]+)[&and]*(\d{1,2})(\D+)(\d{4})') ##1,2,3 &/and July 
         pattern5 = re.compile(r'(\w+)(\d{4})') # july 2023 
         pattern6 = re.compile(r'(\d{1,2})[-\u2013](\d{1,2})[&and]*(\d{1,2})[-\u2013](\d{1,2})(\w+)(\d{4})')
         patterns = [pattern0,pattern1,pattern2,pattern3,pattern5]
@@ -75,11 +77,9 @@ class FromFixer:
             date = [i for i in date if not i ==' ']
             date = "".join(date)
             date_tuple = self.extract_date(date)
-            print(event,date_tuple)
             if date_tuple[-1]==0: 
                 days1 = [i for i in range(int(date_tuple[0]),32)]
                 days2 = [i for i in range(1,int(date_tuple[3])+1)]
-                #print(date_tuple[1],date_tuple[4])
                 dff = pd.DataFrame({"year":[date_tuple[2],date_tuple[-2]],
                                     "month":[self.mapping[date_tuple[1]],self.mapping[date_tuple[4]]],
                                     "days":[days1,days2],
@@ -87,7 +87,7 @@ class FromFixer:
                                     )
                 new_df = pd.concat([new_df,dff])
             elif date_tuple[-1]==1:
-                days1 = [i for i in range(int(date_tuple[0]),32)]
+                days1 = [i for i in range(int(date_tuple[0]),29)]
                 days2 = [i for i in range(1,int(date_tuple[2])+1)]
                 dff = pd.DataFrame({"year":[date_tuple[-2],date_tuple[-2]],
                                     "month":[self.mapping[date_tuple[1]],self.mapping[date_tuple[3]]],
@@ -122,7 +122,7 @@ class FromFixer:
                 new_df = pd.concat([new_df,dff])
             
             if date_tuple[-1]==5:        
-                days = [i for i in range(1,31)]
+                days = [i for i in range(1,29)]
                 dff = pd.DataFrame({"year":[date_tuple[-2]],
                                     "month":[self.mapping[date_tuple[-3]]],
                                     "days":[days],
@@ -169,8 +169,6 @@ class FromFixer:
                 days = date_tuple[0].split(',')
                 days.append(date_tuple[2])
                 days1 =[ int(i) for i in days]
-                #days2 = date_tuple[2].split(',')
-                #days2 =[ int(i) for i in days]
                 dff = pd.DataFrame({"year":[date_tuple[-2],date_tuple[-2]],
                                     "month":[self.mapping[date_tuple[1]],self.mapping[date_tuple[-3]]],
                                     "days":[days1,int(date_tuple[2])],
@@ -179,11 +177,8 @@ class FromFixer:
         return new_df 
         
     def run(self):
-        with open('Scraping\\Sports_\\sportsnews.json') as fr:
+        with open(self.file_path) as fr:
             sports_news = json.load(fr)
         new_df = self.fix_form(sports_news)
         new_df = new_df.sort_values(by=['year', 'month']).reset_index(drop=True)
-        new_df.to_csv("Scraping\\Sports_\\sports_df.csv",index=False)
-if __name__=="__main__":
-    ff = FromFixer()
-    ff.run()
+        new_df.to_csv(self.df_path,index=False)

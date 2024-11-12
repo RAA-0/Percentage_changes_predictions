@@ -1,25 +1,23 @@
-from selenium import webdriver 
-from selenium.webdriver.chrome.options import Options 
 from selenium.webdriver.common.by import By
-from selenium.webdriver.chrome.service import Service
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
-from selenium.webdriver.common.keys import Keys
 from collections import defaultdict
-from abstract_scraper import AbstractScraper
+from Scraping.abstract_scraper import AbstractScraper
 import json 
 import time
 import random 
+import pandas as pd 
 
 
 class DisruptionsScraper(AbstractScraper):
     def __init__(self):
-        super().__init__()
+        super().__init__("disruptions")
 
-    @property
-    def website_url(self):
-        return f"https://media.dubaiairports.ae/?s={self.s}&q=disruption+"
-
+    def run(self):
+        news = self.scrape_news()
+        with open(self.file_path,"w") as jw:
+            json.dump(news,jw,indent=4)
+        self.fix_form(news)
 
     def get_url(self,url):
         driver = super().get_url(url)
@@ -33,13 +31,14 @@ class DisruptionsScraper(AbstractScraper):
         
         time.sleep(random.uniform(2,5))
         return driver 
+    
     def scrape_news(self):
         news=defaultdict(lambda: defaultdict(dict))
         self.s = 0
         done = False
         while not done:
             newss = defaultdict(lambda: defaultdict(dict))
-            driver = self.get_url(self.website_url)
+            driver = self.get_url(self.website_url.format(s=self.s))
             table_cntent=driver.find_element(By.TAG_NAME,"tbody")
             tds = table_cntent.find_elements(By.CLASS_NAME,"td_content")
             for td in tds:
@@ -55,10 +54,27 @@ class DisruptionsScraper(AbstractScraper):
             self.s+=10
 
         return news
-    def run(self):
-        news = self.scrape_news()
-        with open('Scraping\\Disruptions\\nn3.json',"w") as jw:
-            json.dump(news,jw,indent=4)
+    
+    def fix_form(self,data):
+        new_df = pd.DataFrame()
+        for date , news in data.items():
+                df = pd.DataFrame({'year':[date.split("\n")[2]],'month':[self.mapping[date.split("\n")[1]]],'day':[date.split("\n")[0]],'news':[news_headline for news_headline in news.keys()]})
+                new_df=pd.concat([new_df,df])
+
+        new_df.to_csv(self.df_path,index=False)
+    def detect_event(self,date):
+        events=[]
+        keywords =['disruption due to weather','weather disruption']
+        df = pd.read_csv(self.df_path)
+        df['date'] = pd.to_datetime(df[['year', 'month','day']])
+        matching_rows = df[pd.to_datetime(df['date'])==pd.to_datetime(date)]
+        if not matching_rows.empty:
+            news = matching_rows.iloc[0]['news']
+            for i in keywords:
+                if i in news:
+                    events.append('disruption')
+        return events 
+
 
 if __name__=="__main__":
     ds = DisruptionsScraper()

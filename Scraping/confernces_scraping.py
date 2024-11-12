@@ -3,27 +3,30 @@ from selenium.webdriver.chrome.options import Options
 from selenium.webdriver.common.by import By
 from selenium.webdriver.chrome.service import Service
 from selenium.webdriver.common.action_chains import ActionChains
+from Scraping.abstract_scraper import AbstractScraper
 import time 
 import random 
 from collections import defaultdict
 import json 
+import pandas as pd
+import ast 
 
-class ConferenceScraping:
+class ConferenceScraping(AbstractScraper):
     def __init__(self):
-        pass
-    def get_url(self,url):
-        service = Service(executable_path="C:/Users/Lenovo/Desktp/chromedriver-win64/chromedriver.exe")
-        options = Options()
-        options.add_argument('--headless')
-        driver = webdriver.Chrome(service = service)
-        driver.get(url)
-        time.sleep(random.uniform(2,5))
-        return driver         
+        super().__init__("conferences")
+         
+    def run (self,date):
+        new_data = self.scrape_news(date)
+        if new_data is not None and bool(new_data):
+            self.merge_and_save(new_data)
+        else:
+            print("there are no news for this date")
+        self.fix_form()
+
     def scrape_news(self, date):
         news=defaultdict(lambda: defaultdict(list))
         dates = []
-        url = 'https://www.allconferencealert.com/dubai.html'
-        driver =self.get_url(url)
+        driver =super().get_url(self.website_url)
         month_year_elem = driver.find_element(By.XPATH,'/html/body/div[3]/div[1]/div[2]/div/div/div[1]/ul')
         month_year_elements = month_year_elem.find_elements(By.TAG_NAME,"li")
         found = False
@@ -60,7 +63,7 @@ class ConferenceScraping:
                                 break
                         news[year][date_conference[0].text].append(date_conference[1].text)
 
-                    with open('Scraping\\conferences\\n2.json','w') as fe:
+                    with open(self.file_path,'w') as fe:
                         json.dump(news,fe,indent=4)
                 try:
                     next_button = driver.find_element(By.XPATH, "//li[@class='active' and text()='Next']")
@@ -75,41 +78,46 @@ class ConferenceScraping:
                 return news
             
 
-    def merge_and_save(self,old,new):
+    def merge_and_save(self,new):
         for year in new.keys():
-            if not year in old.keys():
-                old.update(new)
+            if not year in self.data.keys():
+                self.data.update(new)
             else:
                 for date in new[year].keys():
-                    if not date in old[year].keys():
-                        old[year][date]=new[year][date]
+                    if not date in self.data[year].keys():
+                        self.data[year][date]=new[year][date]
                     else:
-                        old[year][date].append(new[year][date])
-        for outer_key, inner_dict in old.items():
-            for inner_key, value_list in inner_dict.items():
-                inner_dict[inner_key] = list(set(value_list))
-        with open('Scraping\\conferences\\conference_news.json','w') as fw :
-            json.dump(old,fw,indent=4)
-            
+                        self.data[year][date].extend(new[year][date])
+        for year, inner_dict in self.data.items():
+            for date, conferences in inner_dict.items():
+                inner_dict[date] = list(set(conferences))
+        with open(self.file_path,'w') as fw :
+            json.dump(self.data,fw,indent=4)
 
-            
+    def fix_form(self):
+        new_df = pd.DataFrame()
+        for year in  self.data.keys():
+            for date , list in self.data[year].items():
+                ddf = pd.DataFrame({'year':[year],'month':[self.mapping[date.split(" ")[1]]],'day':[date.split(" ")[0]],'conferences':[list]})
+                new_df=pd.concat([new_df,ddf])
+        new_df.to_csv(self.df_path,index=False)
 
-    def run (self,date):
-        with open('Scraping\\conferences\\conference_news.json','r') as fr:
-            old_data = json.load(fr)
-        new_data = self.scrape_news(date)
-        if new_data is not None and bool(new_data):
-            self.merge_and_save(old_data,new_data)
-        else:
-            print("there are no news for this date")
+    def detect_event(self,date_input):
+        events =[]
+        with open(self.file_path) as f:
+            scraped_news = json.load(f)
+        df = pd.read_csv(self.df_path)
 
-
+        date_input = pd.to_datetime(date_input)
+        year = date_input.year
+        month = date_input.month
+        day = date_input.day
         
-
-
-            
+        matching_rows = df[(df['year'].astype(int) == year) & (df['month'].astype(int)== month) & (df['day'].astype(int)== day) ]
         
-
-cs=ConferenceScraping()
-cs.run("All")
+        if not matching_rows.empty:
+            conference_event = matching_rows.iloc[0]['conferences']
+            conference_event = ast.literal_eval(conference_event)  
+            events.extend(conference_event)
+        return events
 

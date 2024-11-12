@@ -1,0 +1,28 @@
+{
+    "global_health":{
+        "website":"https://www.who.int/news",
+        "file_path":"Scraping\\Global_health\\GlobalHealthNews.json",
+        "df_path":"Scraping\\Global_health\\globalCrisisFeature.csv",
+        "aux_df":"Scraping\\Global_health\\GlobalHealthNews.csv"
+    },
+    "sports":{
+        "website":["https://www.scoreandchange.com/sports_events/past-events","https://www.scoreandchange.com/sports_events/"],
+        "file_path":"Scraping\\Sports_\\sportsnews.json",
+        "df_path":"Scraping\\Sports_\\sports_df.csv"
+    },
+    "various_events":{
+        "website":"https://www.visitdubai.com/en/whats-on/dubai-events-calendar?tags=",
+        "file_path":"",
+        "df_path":""
+    },
+    "conferences":{
+        "website":"https://www.allconferencealert.com/dubai.html",
+        "file_path":"Scraping\\conferences\\conference_news.json",
+        "df_path":"Scraping\\conferences\\conferences_df.csv"
+    },
+    "disruptions":{
+        "website":"https://media.dubaiairports.ae/?s={s}&q=disruption+",
+        "file_path":"Scraping\\Disruptions\\disruption_news.json",
+        "df_path":"Scraping\\Disruptions\\disruptions_df.csv"
+    }
+}

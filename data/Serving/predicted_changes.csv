@@ -1,6 +1,7 @@
-ds,Predicted_arrival_changes,Predicted_departure_changes
-2025-01-17,12.010257931444988,2.6581452038647306
-2027-12-25,22.771700960210275,24.747897036279955
-2028-06-25,2.8928159715042208,7.723411245173127
-2029-10-03,14.725229689191767,9.594541640218909
-2029-12-28,22.69542026755684,23.016754808891626
+ds,event,Predicted_arrival_changes,Predicted_departure_changes
+2020-04-19,"['spring_season', 'corona']",-38.30139162820528,-41.183068039814984
+2022-11-23,"['FIFA World Cup Qatar 2022 (football men)', 'FIFA World Cup Qatar 2022 (football men)', 'Davis Cup Finals Knock-Out Stage (tennis men)']",0.0,0.0
+2023-05-01,['Mutua Madrid Open (tennis)'],0.0,0.0
+2024-12-23,['christmas_season'],21.63846961751236,10.34640190404146
+2025-1-1,"['United Cup (tennis)', 'International Conference on Accounting and Finance (ICAF)', 'International Conference on Recent Innovations in Engineering and Technology (ICRIET)', 'International Conference on Environment and Natural Science (ICENS)', 'International Conference on Education and E-Learning (ICEEL)', 'International Conference on Vehicular, Mobile and Wearable Technology (ICVMWT)', 'International Conference on Economics, Management and Social Study (ICEMSS)', 'International Conference on Science and Innovative Engineering (ICSIE)', 'International Conference on Chemical and Biochemical Engineering (ICCBE)', 'International Conference on Medical and Health Sciences (ICMHS)']",0.0,0.0
+2026-2-1,[],0.0,0.0
