@@ -2,7 +2,6 @@ from Training.Preprocessingg import EventFeatureExtractor
 from Training.Training import DataTrainer
 from path_config.paths_config import PathConfig
 import pandas as pd
-from PredicEnhancement import main as m
 
 def main():
     data = pd.read_csv(conf.path('training_data'))
@@ -13,10 +12,8 @@ def main():
         trainer = DataTrainer(data,target)
         model=trainer.prophet_model()
         trainer.train(model)
-    m()
 
 if __name__=='__main__':
     conf = PathConfig()
-    main()
 
   

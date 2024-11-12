@@ -6,7 +6,6 @@ from path_config.paths_config import PathConfig
 def main():
     p = PreProcessor()
     df = pd.read_csv(conf.path('serving_data'))
-    #df_=df.copy()
     df=df.sort_values(by='ds')
     data=p.preprocess(df)
     events = ["corona","ramadan_season","hajj_season","new_years_eve","eid_al_adha","christmas_season"]

@@ -22,6 +22,6 @@ class EventDetector:
                 e.extend(e_config.detect_event(pd.to_datetime(row['ds'])))
             event_list.append(e)
         X['event']=event_list
-        X[['ds','event']].to_csv("event_detectd.csv",index=False)
+        X[['ds','event']].to_csv("data\\Serving\\events_detected.csv",index=False)
         return X[['ds','event']]
         

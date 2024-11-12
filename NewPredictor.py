@@ -26,7 +26,7 @@ class NewPredictor:
     def new_prediction(self):
         df = (pd.concat([self.df_without_events,self.df_with_events])).sort_values(by='ds')
         df['new_prediction']=df['Predicted_total']*(1+df['predicted_change']/100)
-        df[['ds','event','total','Predicted_total','predicted_change','new_prediction']].to_csv('ndfs.csv',index=False)
+        df[['ds','event','total','Predicted_total','predicted_change','new_prediction']].to_csv('data\\new_predictions.csv',index=False)
         print("old evaluation: ")
         self.evaluate(df['total'],df['Predicted_total'])
         print('new evaluation: ')
