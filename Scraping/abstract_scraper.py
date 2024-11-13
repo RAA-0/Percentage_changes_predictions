@@ -6,6 +6,8 @@ from selenium.webdriver.common.by import By
 import time
 import random
 import json
+import pandas as pd 
+import ast 
 
 class AbstractScraper:
     def __init__(self,event):
@@ -48,8 +50,22 @@ class AbstractScraper:
     def merge_and_save(self):
         pass
 
-    def detect_event(self,date):
-        return []
+    def detect_event(self,date_input):
+        events=[]
+        df = pd.read_csv(self.df_path)
+        if not 'date' in df.columns:
+            df['date'] = pd.to_datetime(df[['year', 'month','day']])
+        matching_rows = df[pd.to_datetime(df['date'])==pd.to_datetime(date_input)]
+        if not matching_rows.empty:
+            event = matching_rows.iloc[0, -1]
+            event = ast.literal_eval(event)  
+            if 'keywords' in self.config.keys():
+                if any(word in event.lower() for word in self.config['keywords']):
+                    events.append(event)
+            elif 'impactful_event' in self.config.keys():
+                if any(word in event.lower() for word in self.config['keywords']):
+                    events.append(event)
+        return events 
     
     def read_file(self,file_path):
         with open(file_path) as jsonreader:

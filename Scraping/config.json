@@ -3,12 +3,15 @@
         "website":"https://www.who.int/news",
         "file_path":"Scraping\\Global_health\\GlobalHealthNews.json",
         "df_path":"Scraping\\Global_health\\globalCrisisFeature.csv",
-        "aux_df":"Scraping\\Global_health\\GlobalHealthNews.csv"
+        "aux_df":"Scraping\\Global_health\\GlobalHealthNews.csv",
+        "keywords":["emergency","pandemic", "virus", "outbreak", "covid", "coronavirus","disease"]
     },
     "sports":{
         "website":["https://www.scoreandchange.com/sports_events/past-events","https://www.scoreandchange.com/sports_events/"],
         "file_path":"Scraping\\Sports_\\sportsnews.json",
-        "df_path":"Scraping\\Sports_\\sports_df.csv"
+        "df_path":"Scraping\\Sports_\\expanded_sports_df.csv",
+        "compressed_df_path":"Scraping\\Sports_\\compressed_sports_df.csv",
+        "impactful_event":["fifa world cup"]
     },
     "various_events":{
         "website":"https://www.visitdubai.com/en/whats-on/dubai-events-calendar?tags=",
@@ -18,11 +21,13 @@
     "conferences":{
         "website":"https://www.allconferencealert.com/dubai.html",
         "file_path":"Scraping\\conferences\\conference_news.json",
-        "df_path":"Scraping\\conferences\\conferences_df.csv"
+        "df_path":"Scraping\\conferences\\conferences_df.csv",
+        "impactful_event":[]
     },
     "disruptions":{
         "website":"https://media.dubaiairports.ae/?s={s}&q=disruption+",
         "file_path":"Scraping\\Disruptions\\disruption_news.json",
-        "df_path":"Scraping\\Disruptions\\disruptions_df.csv"
+        "df_path":"Scraping\\Disruptions\\disruptions_df.csv",
+        "keywords":["disruption due to weather","weather disruption"]
     }
 }

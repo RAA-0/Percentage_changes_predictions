@@ -1,6 +1,7 @@
 import pandas as pd
 import re 
 import json 
+import ast
 
 class FormFixer:
     def __init__(self,file_path,df_path):
@@ -175,10 +176,27 @@ class FormFixer:
                                     "event": event })
                 new_df = pd.concat([new_df,dff])
         return new_df 
+    def expand_df(self):
+        df = pd.read_csv("Scraping\\Sports_\\compressed_sports_df.csv")
+        new_df=pd.DataFrame() 
+        for _, row in df.iterrows():
+            if isinstance(row['days'], str) and row['days'].startswith('['):
+                day_list = ast.literal_eval(row['days'])
+                for day in day_list:
+                    df1 = pd.DataFrame({"year":[row['year']],"month":[row['month']],'day':[day],'event':[row['event']]})
+                    new_df = pd.concat([new_df,df1])
+        new_df['date'] = pd.to_datetime(new_df[['year', 'month', 'day']])
+       
+
+        df_grouped = new_df.groupby('date').agg({'event': list}).reset_index()
+        df_grouped['event'] = df_grouped['event'].apply(lambda x: list(set(x)))
+        return df_grouped
         
     def run(self):
         with open(self.file_path) as fr:
             sports_news = json.load(fr)
         new_df = self.fix_form(sports_news)
-        new_df = new_df.sort_values(by=['year', 'month']).reset_index(drop=True)
+        compressed_df = new_df.sort_values(by=['year', 'month']).reset_index(drop=True)
+        compressed_df.to_csv('Scraping\\Sports_\\compressed_sports_df.csv',index=False)
+        new_df = self.expand_df()
         new_df.to_csv(self.df_path,index=False)

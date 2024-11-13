@@ -79,8 +79,7 @@ class GlobalHealthScraper(AbstractScraper):
                         json.dump(self.data,w2w,indent=4)
     
     def fix_form(self):
-        health_terms = ['emergency','pandemic', 'virus', 'outbreak', 'covid', 'coronavirus','disease']
-        ghe = GlobalHealthExtractor(self.data,self.config['global_health']['aux_df'],health_terms,self.df_path)
+        ghe = GlobalHealthExtractor(self.data,self.config['global_health']['aux_df'],self.config['keywords'],self.df_path)
         ghe.run()
     
     def detect_event(self,date_input):

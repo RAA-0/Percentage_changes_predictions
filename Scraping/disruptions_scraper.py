@@ -62,22 +62,18 @@ class DisruptionsScraper(AbstractScraper):
                 new_df=pd.concat([new_df,df])
 
         new_df.to_csv(self.df_path,index=False)
+
+        
     def detect_event(self,date):
         events=[]
-        keywords =['disruption due to weather','weather disruption']
         df = pd.read_csv(self.df_path)
         df['date'] = pd.to_datetime(df[['year', 'month','day']])
         matching_rows = df[pd.to_datetime(df['date'])==pd.to_datetime(date)]
         if not matching_rows.empty:
             news = matching_rows.iloc[0]['news']
-            for i in keywords:
-                if i in news:
+            if any(word in news.lower() for word in self.config[self.event]['keywords']):
                     events.append('disruption')
         return events 
 
-
-if __name__=="__main__":
-    ds = DisruptionsScraper()
-    ds.run()
 
 

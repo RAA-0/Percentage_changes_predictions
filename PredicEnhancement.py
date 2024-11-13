@@ -1,7 +1,7 @@
 import pandas as pd 
 from Training.Preprocessingg import PreProcessor
 from Training.EventExtraction import EventFeatureExtractor
-from newtr2 import NewPredictor
+from NewPredictor import NewPredictor
 
 def main():
     df=pd.read_csv('data\\testing_pred\\total_arrival_predictions.csv')

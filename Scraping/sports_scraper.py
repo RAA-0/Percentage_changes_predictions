@@ -40,7 +40,7 @@ class SportsScraper(AbstractScraper):
             
             news = [event for event in news if ("|" in event)&("Jump to" not in event)]        
         
-            with open("Scraping\\Sports_\\sportsnews.json","w") as w:
+            with open(self.file_path,"w") as w:
                 json.dump(news,w,indent=4)
 
     def run(self):
@@ -59,9 +59,11 @@ class SportsScraper(AbstractScraper):
             if not matching_rows.empty:
                 sport_event = matching_rows.iloc[0]['event']
                 sport_event = ast.literal_eval(sport_event)  
-                events_on_day.extend(sport_event) 
+                for event in sport_event:
+                    if any(word in event.lower() for word in self.config[self.event]['impactful_event']):
+                        events_on_day.extend(sport_event) 
             return events_on_day 
-        df = pd.read_csv('Scraping\\Sports_\\expanded_sports_df.csv')
+        df = pd.read_csv(self.df_path)
         #df['date'] = pd.to_datetime(df[['year', 'month','day']])
         df['date']=pd.to_datetime(df['date'])
         max_date = df['date'].max()

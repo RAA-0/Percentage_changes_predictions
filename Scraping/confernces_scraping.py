@@ -11,7 +11,7 @@ import json
 import pandas as pd
 import ast 
 
-class ConferenceScraping(AbstractScraper):
+class ConferenceScraper(AbstractScraper):
     def __init__(self):
         super().__init__("conferences")
          
@@ -118,6 +118,7 @@ class ConferenceScraping(AbstractScraper):
         if not matching_rows.empty:
             conference_event = matching_rows.iloc[0]['conferences']
             conference_event = ast.literal_eval(conference_event)  
-            events.extend(conference_event)
+            if any(word in conference_event for word in self.config[self.event]['impactful_event']):
+                events.extend(conference_event)
         return events
 
